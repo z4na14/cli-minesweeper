@@ -52,6 +52,10 @@ namespace common {
              color<Background> const &bg) : val(std::move(val)), fg(fg), bg(bg) {
         }
 
+        explicit cell(std::string val,
+                      color<Background> const &bg) : val(std::move(val)), bg(bg) {
+        }
+
         explicit cell(std::string val) : val(std::move(val)), fg({255, 255, 255}), bg({} /*Transparent bg*/) {
         }
 
@@ -61,6 +65,8 @@ namespace common {
             return os << c.fg << c.bg << c.val << colorReset;
         }
     };
+
+    void print_error(const std::string &msg);
 }
 
 #endif //COMMON_HPP

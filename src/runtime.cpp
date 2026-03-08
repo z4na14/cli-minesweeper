@@ -40,14 +40,18 @@ namespace runtime {
         }
     }
 
-    void loop_runtime(game::Table const *table) {
+    void loop_runtime(game::Table *table) {
         std::thread inputThread(render::get_term_input);
+
+        std::cout << render::controls::CLEAR_SCREEN;
+        table->print_table();
 
         while (true) {
             // Update term size
             if (render::termSize_t newSize = render::get_term_size(); newSize != render::termSize) {
                 render::termSize = newSize;
                 std::cout << render::controls::CLEAR_SCREEN;
+                table->print_table();
             }
 
             // Local thread events
@@ -59,8 +63,21 @@ namespace runtime {
                 std::unique_lock lock(mutex);
                 if (update_input) {
                     // Leer las weadas
-                    render::move_cursor(render::termSize.cols / 2, render::termSize.rows / 2);
-                    std::cout << render::pressed_x << ";" << render::pressed_y;
+                    //std::cout << render::pressed_x << ";" << render::pressed_y;
+
+                    if (render::pressed_button == render::click_buttons::LEFT_BUTTON) {
+                        if (table->modify_cell(render::pressed_x - table->top_x,
+                                               render::pressed_y - table->top_y,
+                                               " ",
+                                               {},
+                                               {
+                                                   render::colors::WHITE[0], render::colors::WHITE[1],
+                                                   render::colors::WHITE[2]
+                                               })
+                            != 0) {
+                            continue;
+                        }
+                    }
 
                     update_input = false;
                 }
@@ -89,7 +106,10 @@ namespace runtime {
 
     inline void update_timer(const std::chrono::time_point<std::chrono::steady_clock> start_timer) {
         const auto diff = std::chrono::steady_clock::now() - start_timer;
+        const auto seconds = std::chrono::duration_cast<std::chrono::seconds>(diff).count();
+        const auto miliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(diff).count() - seconds * 1000;
+
         render::move_cursor(render::termSize.cols - 10, render::termSize.rows - 3);
-        std::cout << std::chrono::duration_cast<std::chrono::seconds>(diff) << std::flush;
+        std::cout << seconds << ":" << miliseconds << std::flush;
     }
 }

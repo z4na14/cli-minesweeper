@@ -14,7 +14,7 @@ namespace runtime {
 
     void init_bootstrap();
 
-    void loop_runtime(game::Table const *table);
+    void loop_runtime(game::Table *table);
 
     void cleanup_bootstrap(game::Table const *table);
 
