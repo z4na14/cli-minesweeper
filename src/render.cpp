@@ -8,6 +8,9 @@
 #include <chrono>
 
 #include "render.hpp"
+
+#include <oneapi/tbb/task_arena.h>
+
 #include "runtime.hpp"
 
 
@@ -27,34 +30,36 @@ namespace render {
     }
 
     void get_term_input() {
-        char c;
-        while (std::cin.get(c) && c != 'q') {
-            // Getting the escape sequence right, and read the input from it
-            if (c == '\033' and
-                std::cin.get() == '[' and
-                std::cin.get() == '<') {
-                int button, x, y;
-                char sep1, sep2, finalChar;
+        try {
+            char c;
+            while (std::cin.get(c) && c != 'q') {
+                // Getting the escape sequence right, and read the input from it
+                if (c == '\033' and
+                    std::cin.get() == '[' and
+                    std::cin.get() == '<') {
+                    int button, x, y;
+                    char sep1, sep2, finalChar;
 
-                // button pressed - separator - x - separator - y - end of line
-                std::cin >> button >> sep1 >> x >> sep2 >> y >> finalChar;
+                    // button pressed - separator - x - separator - y - end of line
+                    std::cin >> button >> sep1 >> x >> sep2 >> y >> finalChar;
 
-                // The CLI returns when the button is pressed and released
-                // True: Down / False: Up
-                if (finalChar == 'M') {
-                    std::unique_lock lock(runtime::mutex);
+                    // The CLI returns when the button is pressed and released
+                    // True: Down / False: Up
+                    if (finalChar == 'M') {
+                        std::unique_lock lock(runtime::mutex);
 
-                    // Reported section is offset to what
-                    // I would expect to "have clicked"
-                    pressed_x = x - 1;
-                    pressed_y = y - 1;
-                    pressed_button = static_cast<click_buttons>(button);
+                        pressed_x = x - 1;
+                        pressed_y = y - 1;
+                        pressed_button = static_cast<click_buttons>(button);
 
-                    runtime::update_input = true;
+                        runtime::update_input = true;
+                    }
                 }
             }
-        } {
-            std::unique_lock lock(runtime::mutex);
+
+            runtime::terminate = true;
+        } catch (std::exception &e) {
+            std::cerr << e.what() << std::endl;
             runtime::terminate = true;
         }
     }

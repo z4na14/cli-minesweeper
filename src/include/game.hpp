@@ -10,11 +10,13 @@
 namespace game {
     class Table {
     public:
-        Table(const int x, const int y) : size_x(x), size_y(y), top_x(0), top_y(0),
-                                          real_index_x(x / 2), real_index_y(y),
+        Table(const int x, const int y) : size_x(x), size_y(y), real_index_x(x / 2), real_index_y(y),
+                                          top_x(0), top_y(0),
                                           start_timer(std::chrono::steady_clock::now()),
-                                          play_site({{}}) {
+                                          play_site({}) {
             // Reserve the play site size to avoid reallocations and out-of-bounds errors
+            // Must be divisible by 2 to avoid strange allocation errors
+            if (x%2!=0 or y%2!=0) throw std::invalid_argument("Precondition failed for x and y size");
 
             play_site.reserve(real_index_x * real_index_y);
             for (int i = 0; i < real_index_y; i++) {
@@ -50,21 +52,22 @@ namespace game {
     };
 
 
+    // SIZE HAS TO BE DIVISIBLE BY 2
     class EasyGame : public Table {
     public:
-        EasyGame() : Table(45, 18) {
+        EasyGame() : Table(46, 18) {
         }
     };
 
     class MediumGame : public Table {
     public:
-        MediumGame() : Table(55, 25) {
+        MediumGame() : Table(56, 26) {
         }
     };
 
     class HardGame : public Table {
     public:
-        HardGame() : Table(85, 32) {
+        HardGame() : Table(86, 32) {
         }
     };
 }

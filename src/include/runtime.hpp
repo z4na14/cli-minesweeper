@@ -2,13 +2,14 @@
 #define GLOBAL_HPP
 
 #include <mutex>
+#include <atomic>
 #include "game.hpp"
 
 
 namespace runtime {
     extern std::mutex mutex;
     extern bool update_input;
-    extern bool terminate;
+    extern std::atomic<bool> terminate;
 
     // ----------------------------------------------------------------------
 
