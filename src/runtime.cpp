@@ -9,7 +9,6 @@
 #include "common.hpp"
 #include "game.hpp"
 
-
 namespace runtime {
     // Shared info between main thread and character reader
     std::mutex MUTEX;
@@ -46,6 +45,7 @@ namespace runtime {
     }
 
     void loop_runtime(game::Table *table) {
+        game::global_game_table = table;
         std::thread inputThread(render::get_term_input);
 
         std::cout << render::controls::CLEAR_SCREEN;
@@ -72,9 +72,9 @@ namespace runtime {
                                 (int)render::PRESSED_BUTTON, render::PRESSED_X, render::PRESSED_Y));
 
                     if (render::PRESSED_BUTTON == render::click_buttons::LEFT_BUTTON) {
-                        table->send_left_click(render::PRESSED_X - table->top_x, render::PRESSED_Y - table->top_y);
+                        table->send_left_click(render::PRESSED_X, render::PRESSED_Y);
                     } else if (render::PRESSED_BUTTON == render::click_buttons::RIGHT_BUTTON) {
-                        table->send_right_click(render::PRESSED_X - table->top_x, render::PRESSED_Y - table->top_y);
+                        table->send_right_click(render::PRESSED_X, render::PRESSED_Y);
                     }
 
                     UPDATE_INPUT = false;
