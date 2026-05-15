@@ -82,7 +82,7 @@ namespace runtime {
             }
             // Check at the end of the mutex if the program terminated
             if (TERMINATE) break;
-            //usleep(render::FRAMERATE_PERIOD);
+            usleep(render::FRAMERATE_PERIOD);
         }
 
         inputThread.join();
