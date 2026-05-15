@@ -8,17 +8,14 @@
 #include <chrono>
 
 #include "render.hpp"
-
-#include <oneapi/tbb/task_arena.h>
-
 #include "runtime.hpp"
 
 
 namespace render {
-    termSize_t termSize;
+    termSize_t TERM_SIZE;
 
-    int pressed_x{}, pressed_y{};
-    click_buttons pressed_button{};
+    int PRESSED_X{}, PRESSED_Y{};
+    click_buttons PRESSED_BUTTON{};
 
 
     termSize_t get_term_size() {
@@ -46,26 +43,26 @@ namespace render {
                     // The CLI returns when the button is pressed and released
                     // True: Down / False: Up
                     if (finalChar == 'M') {
-                        std::unique_lock lock(runtime::mutex);
+                        std::unique_lock lock(runtime::MUTEX);
 
-                        pressed_x = x - 1;
-                        pressed_y = y - 1;
-                        pressed_button = static_cast<click_buttons>(button);
+                        PRESSED_X = x - 1;
+                        PRESSED_Y = y - 1;
+                        PRESSED_BUTTON = static_cast<click_buttons>(button);
 
-                        runtime::update_input = true;
+                        runtime::UPDATE_INPUT = true;
                     }
                 }
             }
 
-            runtime::terminate = true;
+            runtime::TERMINATE = true;
         } catch (std::exception &e) {
             std::cerr << e.what() << std::endl;
-            runtime::terminate = true;
+            runtime::TERMINATE = true;
         }
     }
 
     void move_cursor(const int x, const int y) {
-        if (x > termSize.cols or y > termSize.rows) {
+        if (x > TERM_SIZE.cols or y > TERM_SIZE.rows) {
             common::print_error("Term size too small, make it bigger");
             return;
         }

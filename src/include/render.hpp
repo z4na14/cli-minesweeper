@@ -1,6 +1,7 @@
 #ifndef RENDER_HPP
 #define RENDER_HPP
 
+#include <array>
 #include <string_view>
 #include "common.hpp"
 
@@ -47,10 +48,51 @@ namespace render {
     };
 
     struct colors {
+        // White Fades
         static constexpr std::array<uint8_t, 3> WHITE{255, 255, 255};
+        static constexpr std::array<uint8_t, 3> WHITE_75{191, 191, 191};
+        static constexpr std::array<uint8_t, 3> WHITE_50{127, 127, 127};
+        static constexpr std::array<uint8_t, 3> WHITE_25{64, 64, 64};
+        static constexpr std::array<uint8_t, 3> WHITE_10{25, 25, 25};
+
+        // Red Fades
         static constexpr std::array<uint8_t, 3> RED{255, 0, 0};
+        static constexpr std::array<uint8_t, 3> RED_75{191, 0, 0};
+        static constexpr std::array<uint8_t, 3> RED_50{127, 0, 0};
+        static constexpr std::array<uint8_t, 3> RED_25{64, 0, 0};
+        static constexpr std::array<uint8_t, 3> RED_10{25, 0, 0};
+
+        // Green Fades
         static constexpr std::array<uint8_t, 3> GREEN{0, 255, 0};
+        static constexpr std::array<uint8_t, 3> GREEN_75{0, 191, 0};
+        static constexpr std::array<uint8_t, 3> GREEN_50{0, 127, 0};
+        static constexpr std::array<uint8_t, 3> GREEN_25{0, 64, 0};
+        static constexpr std::array<uint8_t, 3> GREEN_10{0, 25, 0};
+
+        // Blue Fades
         static constexpr std::array<uint8_t, 3> BLUE{0, 0, 255};
+        static constexpr std::array<uint8_t, 3> BLUE_75{0, 0, 191};
+        static constexpr std::array<uint8_t, 3> BLUE_50{0, 0, 127};
+        static constexpr std::array<uint8_t, 3> BLUE_25{0, 0, 64};
+        static constexpr std::array<uint8_t, 3> BLUE_10{0, 0, 25};
+    };
+
+    struct palette {
+        static constexpr std::array<uint8_t, 3> MINES{220, 53, 69};
+        static constexpr std::array<uint8_t, 3> FLAGS{255, 193, 7};
+        static constexpr std::array<uint8_t, 3> TERRAIN{108, 117, 125};
+        static constexpr std::array<uint8_t, 3> TEXT{230, 230, 230};
+
+        static constexpr std::array<std::array<uint8_t, 3>, 8> MINES_COLOR_ARR {
+            colors::BLUE,
+            colors::GREEN_50,
+            colors::RED,
+            colors::BLUE_50,
+            colors::RED_50,
+            {0, 127, 127},
+            {0, 0, 0},
+            colors::WHITE_50
+        };
     };
 
     enum class click_buttons {
@@ -68,9 +110,9 @@ namespace render {
         }
     };
 
-    extern termSize_t termSize;
-    extern int pressed_x, pressed_y;
-    extern click_buttons pressed_button;
+    extern termSize_t TERM_SIZE;
+    extern int PRESSED_X, PRESSED_Y;
+    extern click_buttons PRESSED_BUTTON;
     // 32 Hz
     constexpr uint8_t FRAMERATE_PERIOD{1 / 64 * 100'000};
 
