@@ -47,58 +47,55 @@ namespace render {
         static constexpr std::string_view CROSS{"┼"};
     };
 
-    struct colors {
-        // White Fades
-        static constexpr std::array<uint8_t, 3> WHITE{255, 255, 255};
-        static constexpr std::array<uint8_t, 3> WHITE_75{191, 191, 191};
-        static constexpr std::array<uint8_t, 3> WHITE_50{127, 127, 127};
-        static constexpr std::array<uint8_t, 3> WHITE_25{64, 64, 64};
-        static constexpr std::array<uint8_t, 3> WHITE_10{25, 25, 25};
+struct colors {
+        static constexpr std::array<uint8_t, 3> WHITE{248, 250, 252};
+        static constexpr std::array<uint8_t, 3> WHITE_75{203, 213, 225};
+        static constexpr std::array<uint8_t, 3> WHITE_50{148, 163, 184};
+        static constexpr std::array<uint8_t, 3> WHITE_25{71, 85, 105};
+        static constexpr std::array<uint8_t, 3> WHITE_10{15, 23, 42};
 
-        // Red Fades
-        static constexpr std::array<uint8_t, 3> RED{255, 0, 0};
-        static constexpr std::array<uint8_t, 3> RED_75{191, 0, 0};
-        static constexpr std::array<uint8_t, 3> RED_50{127, 0, 0};
-        static constexpr std::array<uint8_t, 3> RED_25{64, 0, 0};
-        static constexpr std::array<uint8_t, 3> RED_10{25, 0, 0};
+        static constexpr std::array<uint8_t, 3> RED{244, 63, 94};
+        static constexpr std::array<uint8_t, 3> RED_75{225, 29, 72};
+        static constexpr std::array<uint8_t, 3> RED_50{190, 18, 60};
+        static constexpr std::array<uint8_t, 3> RED_25{159, 18, 57};
+        static constexpr std::array<uint8_t, 3> RED_10{76, 5, 25};
 
-        // Green Fades
-        static constexpr std::array<uint8_t, 3> GREEN{0, 255, 0};
-        static constexpr std::array<uint8_t, 3> GREEN_75{0, 191, 0};
-        static constexpr std::array<uint8_t, 3> GREEN_50{0, 127, 0};
-        static constexpr std::array<uint8_t, 3> GREEN_25{0, 64, 0};
-        static constexpr std::array<uint8_t, 3> GREEN_10{0, 25, 0};
+        static constexpr std::array<uint8_t, 3> GREEN{16, 185, 129};
+        static constexpr std::array<uint8_t, 3> GREEN_75{5, 150, 105};
+        static constexpr std::array<uint8_t, 3> GREEN_50{4, 120, 87};
+        static constexpr std::array<uint8_t, 3> GREEN_25{6, 95, 70};
+        static constexpr std::array<uint8_t, 3> GREEN_10{2, 44, 34};
 
-        // Blue Fades
-        static constexpr std::array<uint8_t, 3> BLUE{0, 0, 255};
-        static constexpr std::array<uint8_t, 3> BLUE_75{0, 0, 191};
-        static constexpr std::array<uint8_t, 3> BLUE_50{0, 0, 127};
-        static constexpr std::array<uint8_t, 3> BLUE_25{0, 0, 64};
-        static constexpr std::array<uint8_t, 3> BLUE_10{0, 0, 25};
+        static constexpr std::array<uint8_t, 3> BLUE{59, 130, 246};
+        static constexpr std::array<uint8_t, 3> BLUE_75{37, 99, 235};
+        static constexpr std::array<uint8_t, 3> BLUE_50{29, 78, 216};
+        static constexpr std::array<uint8_t, 3> BLUE_25{30, 64, 175};
+        static constexpr std::array<uint8_t, 3> BLUE_10{23, 37, 84};
     };
 
     struct palette {
-        static constexpr std::array<uint8_t, 3> MINES{220, 53, 69};
-        static constexpr std::array<uint8_t, 3> FLAGS{255, 193, 7};
-        static constexpr std::array<uint8_t, 3> TERRAIN{108, 117, 125};
-        static constexpr std::array<uint8_t, 3> TEXT{230, 230, 230};
+        // Core game elements
+        static constexpr std::array<uint8_t, 3> MINES{239, 68, 68};
+        static constexpr std::array<uint8_t, 3> FLAGS{245, 158, 11};
+        static constexpr std::array<uint8_t, 3> TERRAIN{51, 65, 85};
+        static constexpr std::array<uint8_t, 3> TEXT{241, 245, 249};
 
         static constexpr std::array<std::array<uint8_t, 3>, 8> MINES_COLOR_ARR {
             colors::BLUE,
-            colors::GREEN_50,
+            colors::GREEN,
             colors::RED,
-            colors::BLUE_50,
-            colors::RED_50,
-            {0, 127, 127},
-            {0, 0, 0},
+            {139, 92, 246},
+            {249, 115, 22},
+            {6, 182, 212},
+            colors::WHITE_10,
             colors::WHITE_50
         };
     };
 
     enum class click_buttons {
         LEFT_BUTTON = 0,
-        MIDDLE_BUTTON = 1,
-        RIGHT_BUTTON = 2,
+        RIGHT_BUTTON = 1,
+        MIDDLE_BUTTON = 2,
     };
 
     struct termSize_t {

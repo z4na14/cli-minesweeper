@@ -68,7 +68,8 @@ namespace runtime {
                 std::unique_lock lock(MUTEX);
                 if (UPDATE_INPUT) {
                     // Leer las weadas
-                    //std::cout << render::pressed_x << ";" << render::pressed_y;
+                    print_logs(std::format("Parsed Button: {}, X: {}, Y: {}",
+                                (int)render::PRESSED_BUTTON, render::PRESSED_X, render::PRESSED_Y));
 
                     if (render::PRESSED_BUTTON == render::click_buttons::LEFT_BUTTON) {
                         table->send_left_click(render::PRESSED_X - table->top_x, render::PRESSED_Y - table->top_y);
@@ -81,7 +82,7 @@ namespace runtime {
             }
             // Check at the end of the mutex if the program terminated
             if (TERMINATE) break;
-            usleep(render::FRAMERATE_PERIOD);
+            //usleep(render::FRAMERATE_PERIOD);
         }
 
         inputThread.join();
