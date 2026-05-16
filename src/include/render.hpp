@@ -110,8 +110,8 @@ struct colors {
     extern termSize_t TERM_SIZE;
     extern int PRESSED_X, PRESSED_Y;
     extern click_buttons PRESSED_BUTTON;
-    // 32 Hz
-    constexpr uint8_t FRAMERATE_PERIOD{1 / 64 * 100'000};
+    // 16 Hz
+    constexpr uint32_t FRAMERATE_PERIOD{1'000'000 / 16};
 
     // ----------------------------------------------------------------------
 
