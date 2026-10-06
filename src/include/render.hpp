@@ -5,9 +5,6 @@
 #include "common.hpp"
 
 namespace render {
-    // 32 Hz
-    constexpr uint8_t FRAMERATE_PERIOD{1 / 64 * 100'000};
-
     struct controls {
         static constexpr std::string_view CLEAR_SCREEN = "\x1b[2J\x1b[H";
         static constexpr std::string_view CLEAR_LINE = "\x1b[2K";
@@ -46,6 +43,12 @@ namespace render {
         static constexpr std::array<uint8_t, 3> BLUE{0, 0, 255};
     };
 
+    enum class click_buttons {
+        LEFT_BUTTON = 0,
+        MIDDLE_BUTTON = 1,
+        RIGHT_BUTTON = 2,
+    };
+
     struct termSize_t {
         int rows;
         int cols;
@@ -55,18 +58,22 @@ namespace render {
         }
     };
 
-    void init_bootstrap();
+    extern termSize_t termSize;
+    extern int pressed_x, pressed_y;
+    extern click_buttons pressed_button;
+    // 32 Hz
+    constexpr uint8_t FRAMERATE_PERIOD{1 / 64 * 100'000};
 
-    void loop_runtime();
+    // ----------------------------------------------------------------------
 
-    void cleanup_bootstrap();
+    termSize_t get_term_size();
 
-    termSize_t get_termSize();
+    void move_cursor(int x, int y);
 
-    void setRawMode(bool enable);
+    void set_raw_mode(bool enable);
 
     // Threading function to get input
-    void get_term_input_(std::string &buff);
+    void get_term_input();
 }
 
 #endif //RENDER_HPP
