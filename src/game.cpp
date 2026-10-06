@@ -77,7 +77,6 @@ namespace game {
         cell.fg = fg;
         cell.bg = bg;
 
-        runtime::print_logs(std::format("Modified cell {}, {}", x, y));
         print_table();
         return 0;
     }
@@ -108,7 +107,7 @@ namespace game {
                                 render::colors::RED_50[1],
                                 render::colors::RED_50[2]});
 
-                else if (!current_cell.cleared || !current_cell.flagged) {
+                else if (!current_cell.cleared && !current_cell.flagged) {
                     const std::uint8_t nearby_mines{check_nearby_mines(x, y)};
                     modify_cell(
                         x, y, std::to_string(nearby_mines),
@@ -136,7 +135,10 @@ namespace game {
 
     void Table::send_right_click(const int x, const int y) {
         auto &current_cell{retrieve_cell(x, y)};
-        if (current_cell.flagged) {
+
+        if (current_cell.cleared) {
+            return;
+        } else if (current_cell.flagged) {
             modify_cell(x, y, " ", {},
                         {render::palette::TERRAIN[0],
                         render::palette::TERRAIN[1],

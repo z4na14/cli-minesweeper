@@ -31,9 +31,7 @@ namespace render {
             char c;
             while (std::cin.get(c) && c != 'q') {
                 // Getting the escape sequence right, and read the input from it
-                if (c == '\033' and
-                    std::cin.get() == '[' and
-                    std::cin.get() == '<') {
+                if (c == '\033' and std::cin.get() == '[' and std::cin.get() == '<') {
                     int button, x, y;
                     char sep1, sep2, finalChar;
 
