@@ -2,6 +2,7 @@
 #include <mutex>
 #include <chrono>
 #include <thread>
+#include <atomic>
 
 #include "runtime.hpp"
 #include "render.hpp"
@@ -13,7 +14,7 @@ namespace runtime {
     // Shared info between main thread and character reader
     std::mutex mutex;
     bool update_input{false};
-    bool terminate{false};
+    std::atomic<bool> terminate{false};
 
     void init_bootstrap() {
         try {
@@ -25,9 +26,12 @@ namespace runtime {
                     << render::controls::ENABLE_SGR1006 << std::flush;
 
             render::termSize = render::get_term_size();
+
+#ifdef NDEBUG
             if (render::termSize.cols < 70 || render::termSize.rows < 30)
                 throw std::runtime_error(
                     "Terminal size is too small!\nConsider making it bigger");
+#endif
 
             render::set_raw_mode(true);
         } catch (std::exception const &e) {
@@ -81,10 +85,9 @@ namespace runtime {
 
                     update_input = false;
                 }
-
-                // Check at the end of the mutex if the program terminated
-                if (terminate) break;
             }
+            // Check at the end of the mutex if the program terminated
+            if (terminate) break;
             usleep(render::FRAMERATE_PERIOD);
         }
 
