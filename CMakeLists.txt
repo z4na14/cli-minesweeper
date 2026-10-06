@@ -1,5 +1,6 @@
-cmake_minimum_required(VERSION 4.0)
-project("CLI Minesweeper" LANGUAGES CXX)
+cmake_minimum_required(VERSION "4.0")
+
+project(cli_minesweeper)
+set(CMAKE_CXX_STANDARD 23)
 
 add_subdirectory(src)
-set_property(TARGET src PROPERTY CXX_STANDARD 23)
