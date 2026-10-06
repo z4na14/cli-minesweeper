@@ -28,6 +28,16 @@ namespace render {
         static constexpr std::string_view H_BAR{"─"};
         static constexpr std::string_view V_BAR{"│"};
 
+        // Corners (Double Line)
+        static constexpr std::string_view D_LT_CORNER{"╔"};
+        static constexpr std::string_view D_LB_CORNER{"╚"};
+        static constexpr std::string_view D_RT_CORNER{"╗"};
+        static constexpr std::string_view D_RB_CORNER{"╝"};
+
+        // Bars (Double Line)
+        static constexpr std::string_view D_H_BAR{"═"};
+        static constexpr std::string_view D_V_BAR{"║"};
+
         // T-Junctions
         static constexpr std::string_view T_TOP{"┬"};
         static constexpr std::string_view T_BOTTOM{"┴"};

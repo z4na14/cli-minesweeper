@@ -17,7 +17,7 @@ int main(int const argc, char const **argv) {
 
     runtime::init_bootstrap();
 
-    const game::Table* game = new game::MediumGame{};
+    game::Table *game = new game::HardGame{};
 
     runtime::loop_runtime(game);
 }

@@ -38,14 +38,17 @@ namespace render {
 
                 // button pressed - separator - x - separator - y - end of line
                 std::cin >> button >> sep1 >> x >> sep2 >> y >> finalChar;
+
                 // The CLI returns when the button is pressed and released
                 // True: Down / False: Up
-                bool pressed{finalChar == 'M'}; {
+                if (finalChar == 'M') {
                     std::unique_lock lock(runtime::mutex);
 
-                    pressed_x = x;
-                    pressed_y = y;
-                    pressed_button = static_cast<click_buttons>(finalChar);
+                    // Reported section is offset to what
+                    // I would expect to "have clicked"
+                    pressed_x = x - 1;
+                    pressed_y = y - 1;
+                    pressed_button = static_cast<click_buttons>(button);
 
                     runtime::update_input = true;
                 }
@@ -57,9 +60,10 @@ namespace render {
     }
 
     void move_cursor(const int x, const int y) {
-        if (x > termSize.cols or y > termSize.rows)
-            throw
-                    std::runtime_error("Out of bounds coordinates to move cursor");
+        if (x > termSize.cols or y > termSize.rows) {
+            common::print_error("Term size too small, make it bigger");
+            return;
+        }
         std::cout << "\033[" << y << ";" << x << "H" << std::flush;
     }
 
