@@ -1,14 +1,16 @@
-#include <format>
 #include <random>
 #include <algorithm>
 #include <numeric>
 
+#include "game.hpp"
 #include "render.hpp"
 #include "common.hpp"
 #include "runtime.hpp"
 
 
 namespace game {
+    Table *global_game_table = nullptr;
+
     void Table::print_table() {
         // +2 to account for the borders on both sides
         const int total_width = size_x + 2;
@@ -99,29 +101,36 @@ namespace game {
               break;*/
 
             case runtime::GAME:
-                auto &current_cell {retrieve_cell(x, y)};
+                if (x >= global_game_table->top_x and x < global_game_table->top_x + global_game_table->size_x and
+                    y >= global_game_table->top_y and y < global_game_table->top_y + global_game_table->size_y) {
 
-                if (current_cell.type == CellType::Bomb)
-                    modify_cell(x, y, " ", {},
-                                {render::colors::RED_50[0],
-                                render::colors::RED_50[1],
-                                render::colors::RED_50[2]});
+                    // Normalize the size inside the check, to allow for clicking buttons outside the play space
+                    auto normalized_x = x - global_game_table->top_x;
+                    auto normalized_y = y - global_game_table->top_y;
 
-                else if (!current_cell.cleared && !current_cell.flagged) {
-                    const std::uint8_t nearby_mines{check_nearby_mines(x, y)};
-                    modify_cell(
-                        x, y, std::to_string(nearby_mines),
-                        {render::palette::MINES_COLOR_ARR[nearby_mines][0],
-                         render::palette::MINES_COLOR_ARR[nearby_mines][1],
-                         render::palette::MINES_COLOR_ARR[nearby_mines][2]},
-                        {render::palette::TERRAIN[0],
-                         render::palette::TERRAIN[1],
-                         render::palette::TERRAIN[2]});
-                    current_cell.cleared = true;
+                    auto &current_cell {retrieve_cell(normalized_x, normalized_y)};
 
-                    if (nearby_mines == 0) clear_nearby_empty_cells(x, y);
+                    if (current_cell.type == CellType::Bomb)
+                        modify_cell(normalized_x, normalized_y, " ", {},
+                                    {render::colors::RED_50[0],
+                                    render::colors::RED_50[1],
+                                    render::colors::RED_50[2]});
+
+                    else if (!current_cell.cleared && !current_cell.flagged) {
+                        const std::uint8_t nearby_mines{check_nearby_mines(normalized_x, normalized_y)};
+                        modify_cell(
+                            normalized_x, normalized_y, std::to_string(nearby_mines),
+                            {render::palette::MINES_COLOR_ARR[nearby_mines][0],
+                            render::palette::MINES_COLOR_ARR[nearby_mines][1],
+                            render::palette::MINES_COLOR_ARR[nearby_mines][2]},
+                            {render::palette::TERRAIN[0],
+                            render::palette::TERRAIN[1],
+                            render::palette::TERRAIN[2]});
+                        current_cell.cleared = true;
+
+                        if (nearby_mines == 0) clear_nearby_empty_cells(normalized_x, normalized_y);
+                    }
                 }
-
                 break;
 
             /*case runtime::END:
@@ -134,26 +143,33 @@ namespace game {
     }
 
     void Table::send_right_click(const int x, const int y) {
-        auto &current_cell{retrieve_cell(x, y)};
+        if (x >= global_game_table->top_x and x < global_game_table->top_x + global_game_table->size_x and
+            y >= global_game_table->top_y and y < global_game_table->top_y + global_game_table->size_y) {
 
-        if (current_cell.cleared) {
-            return;
-        } else if (current_cell.flagged) {
-            modify_cell(x, y, " ", {},
-                        {render::palette::TERRAIN[0],
-                        render::palette::TERRAIN[1],
-                        render::palette::TERRAIN[2]});
-        } else {
-            modify_cell(x, y, "⚑",
-                        {render::palette::FLAGS[0],
-                        render::palette::FLAGS[1],
-                        render::palette::FLAGS[2]},
-                        {render::palette::TERRAIN[0],
-                        render::palette::TERRAIN[1],
-                        render::palette::TERRAIN[2]});
+            // Normalize the size inside the check, to allow for clicking buttons outside the play space
+            auto normalized_x = x - global_game_table->top_x;
+            auto normalized_y = y - global_game_table->top_y;
+            auto &current_cell{retrieve_cell(normalized_x, normalized_y)};
+
+            if (current_cell.cleared) {
+                return;
+            } else if (current_cell.flagged) {
+                modify_cell(normalized_x, normalized_y, " ", {},
+                            {render::palette::TERRAIN[0],
+                            render::palette::TERRAIN[1],
+                            render::palette::TERRAIN[2]});
+            } else {
+                modify_cell(normalized_x, normalized_y, "⚑",
+                            {render::palette::FLAGS[0],
+                            render::palette::FLAGS[1],
+                            render::palette::FLAGS[2]},
+                            {render::palette::TERRAIN[0],
+                            render::palette::TERRAIN[1],
+                            render::palette::TERRAIN[2]});
+            }
+
+            current_cell.flagged = !current_cell.flagged;
         }
-
-        current_cell.flagged = !current_cell.flagged;
     }
 
     void Table::distribute_mines(const int mine_count) {

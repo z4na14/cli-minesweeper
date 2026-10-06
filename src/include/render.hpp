@@ -94,8 +94,8 @@ struct colors {
 
     enum class click_buttons {
         LEFT_BUTTON = 0,
-        RIGHT_BUTTON = 1,
-        MIDDLE_BUTTON = 2,
+        MIDDLE_BUTTON = 1,
+        RIGHT_BUTTON = 2,
     };
 
     struct termSize_t {

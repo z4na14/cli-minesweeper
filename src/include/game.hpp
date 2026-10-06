@@ -8,8 +8,7 @@
 
 
 namespace game {
-    class Table {
-    public:
+    struct Table {
         Table(const int x, const int y, const int mine_count) : size_x(x), size_y(y), real_index_x(x / 2),
                                                                 real_index_y(y),
                                                                 top_x(0), top_y(0),
@@ -106,6 +105,10 @@ namespace game {
         HardGame() : Table(86, 32, 300) {
         }
     };
+
+    // ---
+
+    extern Table *global_game_table;
 }
 
 
