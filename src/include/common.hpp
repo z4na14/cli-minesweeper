@@ -9,6 +9,11 @@ typedef enum {
     Background = 48
 } Layer;
 
+enum class CellType{
+    Clear = 0,
+    Bomb = 1
+};
+
 namespace common {
     constexpr std::string colorReset{"\x1b[0m"};
 
@@ -38,10 +43,17 @@ namespace common {
                    << static_cast<int>(c.g) << ";"
                    << static_cast<int>(c.b) << "m";
         }
+
+        color& operator=(const color& other) = default;
     };
 
     struct cell {
         std::string val{};
+        CellType type{CellType::Clear};
+
+        bool cleared{false}; // Check if cell already cleared for mines
+        bool flagged{false}; // Check if cell has flag over or not (In case of cleared skip check)
+
         color<Foreground> fg{};
         color<Background> bg{};
 

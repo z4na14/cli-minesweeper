@@ -12,9 +12,10 @@
 
 namespace runtime {
     // Shared info between main thread and character reader
-    std::mutex mutex;
-    bool update_input{false};
-    std::atomic<bool> terminate{false};
+    std::mutex MUTEX;
+    bool UPDATE_INPUT{false};
+    std::atomic<bool> TERMINATE{false};
+    game_status GAME_STATUS{GAME};
 
     void init_bootstrap() {
         try {
@@ -25,10 +26,10 @@ namespace runtime {
                     << render::controls::ENABLE_MOUSE
                     << render::controls::ENABLE_SGR1006 << std::flush;
 
-            render::termSize = render::get_term_size();
+            render::TERM_SIZE = render::get_term_size();
 
 #ifdef NDEBUG
-            if (render::termSize.cols < 70 || render::termSize.rows < 30)
+            if (render::TERM_SIZE.cols < 70 || render::TERM_SIZE.rows < 30)
                 throw std::runtime_error(
                     "Terminal size is too small!\nConsider making it bigger");
 #endif
@@ -52,8 +53,8 @@ namespace runtime {
 
         while (true) {
             // Update term size
-            if (render::termSize_t newSize = render::get_term_size(); newSize != render::termSize) {
-                render::termSize = newSize;
+            if (render::termSize_t newSize = render::get_term_size(); newSize != render::TERM_SIZE) {
+                render::TERM_SIZE = newSize;
                 std::cout << render::controls::CLEAR_SCREEN;
                 table->print_table();
             }
@@ -64,30 +65,22 @@ namespace runtime {
             // Reading input events
             {
                 // Locked while in scope. I had no fucking idea cpp allowed this
-                std::unique_lock lock(mutex);
-                if (update_input) {
+                std::unique_lock lock(MUTEX);
+                if (UPDATE_INPUT) {
                     // Leer las weadas
                     //std::cout << render::pressed_x << ";" << render::pressed_y;
 
-                    if (render::pressed_button == render::click_buttons::LEFT_BUTTON) {
-                        if (table->modify_cell(render::pressed_x - table->top_x,
-                                               render::pressed_y - table->top_y,
-                                               " ",
-                                               {},
-                                               {
-                                                   render::colors::WHITE[0], render::colors::WHITE[1],
-                                                   render::colors::WHITE[2]
-                                               })
-                            != 0) {
-                            continue;
-                        }
+                    if (render::PRESSED_BUTTON == render::click_buttons::LEFT_BUTTON) {
+                        table->send_left_click(render::PRESSED_X - table->top_x, render::PRESSED_Y - table->top_y);
+                    } else if (render::PRESSED_BUTTON == render::click_buttons::RIGHT_BUTTON) {
+                        table->send_right_click(render::PRESSED_X - table->top_x, render::PRESSED_Y - table->top_y);
                     }
 
-                    update_input = false;
+                    UPDATE_INPUT = false;
                 }
             }
             // Check at the end of the mutex if the program terminated
-            if (terminate) break;
+            if (TERMINATE) break;
             usleep(render::FRAMERATE_PERIOD);
         }
 
@@ -107,12 +100,20 @@ namespace runtime {
         exit(EXIT_SUCCESS);
     }
 
-    inline void update_timer(const std::chrono::time_point<std::chrono::steady_clock> start_timer) {
+    void update_timer(const std::chrono::time_point<std::chrono::steady_clock> start_timer) {
         const auto diff = std::chrono::steady_clock::now() - start_timer;
         const auto seconds = std::chrono::duration_cast<std::chrono::seconds>(diff).count();
-        const auto miliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(diff).count() - seconds * 1000;
+        const auto miliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(diff).count() - seconds *
+                                 1000;
 
-        render::move_cursor(render::termSize.cols - 10, render::termSize.rows - 3);
+        render::move_cursor(render::TERM_SIZE.cols - 10, render::TERM_SIZE.rows - 3);
         std::cout << seconds << ":" << miliseconds << std::flush;
+    }
+
+    void print_logs(const std::string &message) {
+#ifndef NDEBUG
+        render::move_cursor(0, render::TERM_SIZE.rows);
+        std::cerr << "[[ LOG: " << message << " ]]" << std::flush;
+#endif
     }
 }

@@ -7,9 +7,16 @@
 
 
 namespace runtime {
-    extern std::mutex mutex;
-    extern bool update_input;
-    extern std::atomic<bool> terminate;
+    enum game_status {
+        SELECTION = 0,
+        GAME = 1,
+        END = 2,
+    };
+
+    extern std::mutex MUTEX;
+    extern bool UPDATE_INPUT;
+    extern std::atomic<bool> TERMINATE;
+    extern game_status GAME_STATUS;
 
     // ----------------------------------------------------------------------
 
@@ -19,7 +26,10 @@ namespace runtime {
 
     void cleanup_bootstrap(game::Table const *table);
 
-    inline void update_timer(std::chrono::time_point<std::chrono::steady_clock> start_timer);
+    void update_timer(
+        std::chrono::time_point<std::chrono::steady_clock> start_timer);
+
+    void print_logs(const std::string &message);
 }
 
 #endif //GLOBAL_HPP
