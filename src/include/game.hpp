@@ -78,8 +78,6 @@ struct Table {
     void clear_nearby_empty_cells(int x, int y);
 };
 
-namespace actions {};
-
 // SIZE HAS TO BE DIVISIBLE BY 2
 class EasyGame : public Table {
   public:

@@ -19,12 +19,10 @@ int main(int const argc, char const **argv) {
 
     case 1:
         game = new game::MediumGame{};
-        std::cerr << "Medium game selected" << '\n';
         break;
 
     case 2:
         game = new game::HardGame{};
-        std::cerr << "Hard game selected" << '\n';
         break;
 
     default:

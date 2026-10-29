@@ -6,20 +6,15 @@
 #include <mutex>
 
 namespace runtime {
-enum game_status {
-    SELECTION = 0,
-    GAME = 1,
-    END = 2,
-};
 struct Params {
     unsigned int level = 0;
     // More binary params will be added here
 };
 
 extern std::mutex MUTEX;
-extern bool UPDATE_INPUT;
+extern std::atomic<bool> UPDATE_INPUT;
 extern std::atomic<bool> TERMINATE;
-extern game_status GAME_STATUS;
+extern std::atomic<bool> DEAD;
 
 // ----------------------------------------------------------------------
 

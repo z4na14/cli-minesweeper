@@ -93,53 +93,41 @@ common::cell &Table::retrieve_cell(const int x, const int y) {
 }
 
 void Table::send_left_click(const int x, const int y) {
-    switch (runtime::GAME_STATUS) {
-        /*case runtime::SELECTION:
-            break;*/
+    if (x >= global_game_table->top_x and
+        x < global_game_table->top_x + global_game_table->size_x and
+        y >= global_game_table->top_y and
+        y < global_game_table->top_y + global_game_table->size_y) {
 
-    case runtime::GAME:
-        if (x >= global_game_table->top_x and
-            x < global_game_table->top_x + global_game_table->size_x and
-            y >= global_game_table->top_y and
-            y < global_game_table->top_y + global_game_table->size_y) {
+        // Normalize the size inside the check, to allow for clicking
+        // buttons outside the play space
+        auto normalized_x = x - global_game_table->top_x;
+        auto normalized_y = y - global_game_table->top_y;
 
-            // Normalize the size inside the check, to allow for clicking
-            // buttons outside the play space
-            auto normalized_x = x - global_game_table->top_x;
-            auto normalized_y = y - global_game_table->top_y;
+        auto &current_cell{retrieve_cell(normalized_x, normalized_y)};
 
-            auto &current_cell{retrieve_cell(normalized_x, normalized_y)};
+        if (current_cell.type == CellType::Bomb) {
+            modify_cell(normalized_x, normalized_y, " ", {},
+                        {render::colors::RED_50[0], render::colors::RED_50[1],
+                         render::colors::RED_50[2]});
 
-            if (current_cell.type == CellType::Bomb)
-                modify_cell(normalized_x, normalized_y, " ", {},
-                            {render::colors::RED_50[0],
-                             render::colors::RED_50[1],
-                             render::colors::RED_50[2]});
-
-            else if (!current_cell.cleared && !current_cell.flagged) {
-                const std::uint8_t nearby_mines{
-                    check_nearby_mines(normalized_x, normalized_y)};
-                modify_cell(
-                    normalized_x, normalized_y, std::to_string(nearby_mines),
-                    {render::palette::MINES_COLOR_ARR[nearby_mines][0],
-                     render::palette::MINES_COLOR_ARR[nearby_mines][1],
-                     render::palette::MINES_COLOR_ARR[nearby_mines][2]},
-                    {render::palette::TERRAIN[0], render::palette::TERRAIN[1],
-                     render::palette::TERRAIN[2]});
-                current_cell.cleared = true;
-
-                if (nearby_mines == 0)
-                    clear_nearby_empty_cells(normalized_x, normalized_y);
-            }
+            runtime::DEAD = true;
         }
-        break;
 
-        /*case runtime::END:
-            break;*/
+        else if (!current_cell.cleared && !current_cell.flagged) {
+            const std::uint8_t nearby_mines{
+                check_nearby_mines(normalized_x, normalized_y)};
+            modify_cell(
+                normalized_x, normalized_y, std::to_string(nearby_mines),
+                {render::palette::MINES_COLOR_ARR[nearby_mines][0],
+                 render::palette::MINES_COLOR_ARR[nearby_mines][1],
+                 render::palette::MINES_COLOR_ARR[nearby_mines][2]},
+                {render::palette::TERRAIN[0], render::palette::TERRAIN[1],
+                 render::palette::TERRAIN[2]});
+            current_cell.cleared = true;
 
-        /*default:
-            common::print_error("Internal error: Exiting");
-            runtime::TERMINATE = true;*/
+            if (nearby_mines == 0)
+                clear_nearby_empty_cells(normalized_x, normalized_y);
+        }
     }
 }
 

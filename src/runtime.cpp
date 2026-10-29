@@ -16,9 +16,9 @@
 namespace runtime {
 // Shared info between main thread and character reader
 std::mutex MUTEX;
-bool UPDATE_INPUT{false};
+std::atomic<bool> UPDATE_INPUT{false};
 std::atomic<bool> TERMINATE{false};
-game_status GAME_STATUS{GAME};
+std::atomic<bool> DEAD{false};
 
 void init_bootstrap() {
     try {
@@ -64,13 +64,14 @@ void loop_runtime(game::Table *table) {
         }
 
         // Local thread events
-        update_timer(table->start_timer);
+        if (!DEAD)
+            update_timer(table->start_timer);
 
         // Reading input events
         {
             // Locked while in scope. I had no fucking idea cpp allowed this
             std::unique_lock lock(MUTEX);
-            if (UPDATE_INPUT) {
+            if (!DEAD && UPDATE_INPUT) {
                 // Leer las weadas
                 common::print_logs(
                     std::format("Parsed Button: {}, X: {}, Y: {}",
