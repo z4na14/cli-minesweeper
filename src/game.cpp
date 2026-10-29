@@ -113,7 +113,11 @@ void Table::send_left_click(const int x, const int y) {
             runtime::DEAD = true;
         }
 
-        else if (!current_cell.cleared && !current_cell.flagged) {
+        else if (current_cell.cleared) {
+            handle_cleared_left_click(normalized_x, normalized_y);
+        }
+
+        else if (!current_cell.flagged) {
             const std::uint8_t nearby_mines{
                 check_nearby_mines(normalized_x, normalized_y)};
             modify_cell(
@@ -127,6 +131,70 @@ void Table::send_left_click(const int x, const int y) {
 
             if (nearby_mines == 0)
                 clear_nearby_empty_cells(normalized_x, normalized_y);
+        }
+    }
+}
+
+void Table::handle_cleared_left_click(const int x, const int y) {
+    if (x < 0 || x >= size_x || y < 0 || y >= size_y)
+        return;
+
+    const auto nearby_mines = check_nearby_mines(x, y);
+    std::uint8_t nearby_flags = 0;
+
+    for (int dy = -1; dy <= 1; ++dy) {
+        for (int dx = -1; dx <= 1; ++dx) {
+            // Apply the offset, since there are 2 cells per space
+            const int new_x = x + (dx * 2);
+            const int new_y = y + dy;
+
+            if (new_x < 0 || new_x >= size_x || new_y < 0 || new_y >= size_y ||
+                (dx == 0 && dy == 0)) {
+                continue;
+            }
+            nearby_flags += retrieve_cell(new_x, new_y).flagged;
+        }
+    }
+
+    // Only clear when the flags placed around the cell match its number
+    if (nearby_flags != nearby_mines)
+        return;
+
+    // Clear every unflagged neighbor. This is intentionally not recursive, so
+    // empty cells are revealed as plain zeros instead of cascading
+    for (int dy = -1; dy <= 1; ++dy) {
+        for (int dx = -1; dx <= 1; ++dx) {
+            const int new_x = x + (dx * 2);
+            const int new_y = y + dy;
+
+            if (new_x < 0 || new_x >= size_x || new_y < 0 || new_y >= size_y ||
+                (dx == 0 && dy == 0)) {
+                continue;
+            }
+
+            auto &current_cell = retrieve_cell(new_x, new_y);
+            if (current_cell.cleared || current_cell.flagged)
+                continue;
+
+            // A mine was not flagged, so the player loses
+            if (current_cell.type == CellType::Bomb) {
+                modify_cell(new_x, new_y, " ", {},
+                            {render::colors::RED_50[0],
+                             render::colors::RED_50[1],
+                             render::colors::RED_50[2]});
+                runtime::DEAD = true;
+                continue;
+            }
+
+            const auto mines = check_nearby_mines(new_x, new_y);
+            modify_cell(new_x, new_y, std::to_string(mines),
+                        {render::palette::MINES_COLOR_ARR[mines][0],
+                         render::palette::MINES_COLOR_ARR[mines][1],
+                         render::palette::MINES_COLOR_ARR[mines][2]},
+                        {render::palette::TERRAIN[0],
+                         render::palette::TERRAIN[1],
+                         render::palette::TERRAIN[2]});
+            current_cell.cleared = true;
         }
     }
 }
@@ -184,6 +252,46 @@ void Table::distribute_mines(const int mine_count) {
     for (int i = 0; i < mine_count; ++i) {
         play_site[indices[i]].type = CellType::Bomb;
     }
+}
+
+void Table::clear_starting_area() {
+    // Small square patch, placed at a random spot on the board
+    constexpr int patch_size = 3;
+    if (real_index_x < patch_size || real_index_y < patch_size)
+        return;
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> dist_x(0, real_index_x - patch_size);
+    std::uniform_int_distribution<int> dist_y(0, real_index_y - patch_size);
+    const int start_x = dist_x(gen);
+    const int start_y = dist_y(gen);
+
+    // Defuse every mine inside the patch first, so the center always ends up
+    // with zero nearby mines and the clearing handler can expand from it
+    for (int y = start_y; y < start_y + patch_size; ++y) {
+        for (int x = start_x; x < start_x + patch_size; ++x) {
+            auto &current_cell = play_site[y * real_index_x + x];
+            if (current_cell.type == CellType::Bomb) {
+                current_cell.type = CellType::Clear;
+                --remaining_mines;
+            }
+        }
+    }
+
+    // Reveal the center, then let the clearing handler empty the patch
+    const int seed_x = start_x + patch_size / 2;
+    const int seed_y = start_y + patch_size / 2;
+    const auto nearby_mines = check_nearby_mines(seed_x * 2, seed_y);
+    modify_cell(seed_x * 2, seed_y, std::to_string(nearby_mines),
+                {render::palette::MINES_COLOR_ARR[nearby_mines][0],
+                 render::palette::MINES_COLOR_ARR[nearby_mines][1],
+                 render::palette::MINES_COLOR_ARR[nearby_mines][2]},
+                {render::palette::TERRAIN[0], render::palette::TERRAIN[1],
+                 render::palette::TERRAIN[2]});
+    retrieve_cell(seed_x * 2, seed_y).cleared = true;
+
+    clear_nearby_empty_cells(seed_x * 2, seed_y);
 }
 
 std::uint8_t Table::check_nearby_mines(const int x, const int y) {

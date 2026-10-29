@@ -82,8 +82,8 @@ struct palette {
     static constexpr std::array<uint8_t, 3> TEXT{241, 245, 249};
 
     static constexpr std::array<std::array<uint8_t, 3>, 8> MINES_COLOR_ARR{
-        colors::BLUE,   colors::GREEN, colors::RED,      {139, 92, 246},
-        {249, 115, 22}, {6, 182, 212}, colors::WHITE_10, colors::WHITE_50};
+        palette::TERRAIN, colors::GREEN, colors::RED,      {139, 92, 246},
+        {249, 115, 22},   {6, 182, 212}, colors::WHITE_10, colors::WHITE_50};
 };
 
 enum class click_buttons {

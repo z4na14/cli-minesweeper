@@ -20,7 +20,7 @@ std::atomic<bool> UPDATE_INPUT{false};
 std::atomic<bool> TERMINATE{false};
 std::atomic<bool> DEAD{false};
 
-void init_bootstrap() {
+void init_bootstrap(game::Table *table) {
     try {
         // Empty screen before doing anything
         std::cout << render::controls::CLEAR_BUFFER
@@ -36,6 +36,10 @@ void init_bootstrap() {
                 "Terminal size is too small!\nConsider making it bigger");
 
         render::set_raw_mode(true);
+
+        // Reveal a small safe area so the player has somewhere to start
+        if (table != nullptr)
+            table->clear_starting_area();
     } catch (std::exception const &e) {
         const common::cell error{e.what(),
                                  {render::colors::RED[0],

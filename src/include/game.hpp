@@ -68,8 +68,16 @@ struct Table {
     // Randomly distribute mines across the table
     void distribute_mines(int mine_count);
 
+    // Defuse the mines inside a small random patch and reveal it, giving the
+    // player a safe area to start from
+    void clear_starting_area();
+
     // Game handler for left and right click actions
     void send_left_click(int x, int y);
+
+    // Chord handler: clicking an already cleared cell clears its unflagged
+    // neighbors when the surrounding flags match the cell's number
+    void handle_cleared_left_click(int x, int y);
 
     void send_right_click(int x, int y);
 

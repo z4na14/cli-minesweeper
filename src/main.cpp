@@ -9,8 +9,6 @@ int main(int const argc, char const **argv) {
     runtime::Params params{};
     runtime::arg_parser(args, params);
 
-    runtime::init_bootstrap();
-
     game::Table *game;
     switch (params.level) {
     case 0:
@@ -30,5 +28,6 @@ int main(int const argc, char const **argv) {
         return -1;
     }
 
+    runtime::init_bootstrap(game);
     runtime::loop_runtime(game);
 }

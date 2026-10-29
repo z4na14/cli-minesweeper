@@ -18,7 +18,7 @@ extern std::atomic<bool> DEAD;
 
 // ----------------------------------------------------------------------
 
-void init_bootstrap();
+void init_bootstrap(game::Table *table);
 
 void loop_runtime(game::Table *table);
 
