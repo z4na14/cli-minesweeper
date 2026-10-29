@@ -43,6 +43,7 @@
 # CMake build directories
 cmake-*
 compile_commands.json
+build
 
 #IDE folders
 .idea
