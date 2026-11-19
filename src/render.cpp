@@ -26,6 +26,11 @@ void get_term_input() {
     try {
         char c;
         while (std::cin.get(c) && c != 'q') {
+            if (c == 'r') {
+                runtime::RESTART = true;
+                return;
+            }
+
             // Getting the escape sequence right, and read the input from it
             if (c == '\033' and std::cin.get() == '[' and
                 std::cin.get() == '<') {

@@ -8,26 +8,29 @@ int main(int const argc, char const **argv) {
     std::span<const char *> args(argv, argc);
     runtime::Params params{};
     runtime::arg_parser(args, params);
+    runtime::init_bootstrap();
 
     game::Table *game;
-    switch (params.level) {
-    case 0:
-        game = new game::EasyGame{};
-        break;
 
-    case 1:
-        game = new game::MediumGame{};
-        break;
+    while (!runtime::TERMINATE) {
+        switch (params.level) {
+        case 0:
+            game = new game::EasyGame{};
+            break;
 
-    case 2:
-        game = new game::HardGame{};
-        break;
+        case 1:
+            game = new game::MediumGame{};
+            break;
 
-    default:
-        common::print_error("Undefined difficulty param. Use between 0 and 2.");
-        return -1;
+        case 2:
+            game = new game::HardGame{};
+            break;
+
+        default:
+            common::print_error(
+                "Undefined difficulty param. Use between 0 and 2.");
+            return -1;
+        }
+        runtime::loop_runtime(game);
     }
-
-    runtime::init_bootstrap(game);
-    runtime::loop_runtime(game);
 }

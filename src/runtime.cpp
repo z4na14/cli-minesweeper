@@ -18,9 +18,10 @@ namespace runtime {
 std::mutex MUTEX;
 std::atomic<bool> UPDATE_INPUT{false};
 std::atomic<bool> TERMINATE{false};
+std::atomic<bool> RESTART{false};
 std::atomic<bool> DEAD{false};
 
-void init_bootstrap(game::Table *table) {
+void init_bootstrap() {
     try {
         // Empty screen before doing anything
         std::cout << render::controls::CLEAR_BUFFER
@@ -36,10 +37,6 @@ void init_bootstrap(game::Table *table) {
                 "Terminal size is too small!\nConsider making it bigger");
 
         render::set_raw_mode(true);
-
-        // Reveal a small safe area so the player has somewhere to start
-        if (table != nullptr)
-            table->clear_starting_area();
     } catch (std::exception const &e) {
         const common::cell error{e.what(),
                                  {render::colors::RED[0],
@@ -52,6 +49,13 @@ void init_bootstrap(game::Table *table) {
 }
 
 void loop_runtime(game::Table *table) {
+    // Every call to loop_runtime starts a fresh game, so clear the state left
+    // over from the previous run. Without this, a restart request would break
+    // the new game immediately and a previous death would ignore all input.
+    RESTART = false;
+    DEAD = false;
+    UPDATE_INPUT = false;
+
     game::global_game_table = table;
     std::thread inputThread(render::get_term_input);
 
@@ -96,13 +100,20 @@ void loop_runtime(game::Table *table) {
             }
         }
         // Check at the end of the mutex if the program terminated
-        if (TERMINATE)
+        if (TERMINATE or RESTART)
             break;
         usleep(render::FRAMERATE_PERIOD);
     }
 
     inputThread.join();
-    cleanup_bootstrap(table);
+
+    // Only restore the terminal when actually leaving the program. On a
+    // restart the next game reuses the raw mode and mouse tracking that are
+    // still enabled, so tearing them down here would make it ignore input.
+    if (TERMINATE)
+        cleanup_bootstrap(table);
+    else
+        delete table;
 }
 
 void cleanup_bootstrap(game::Table const *table) {
@@ -112,8 +123,6 @@ void cleanup_bootstrap(game::Table const *table) {
     render::set_raw_mode(false);
 
     delete table;
-
-    exit(EXIT_SUCCESS);
 }
 
 void update_timer(

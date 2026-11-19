@@ -7,6 +7,13 @@
 #include "render.hpp"
 
 namespace game {
+
+enum class Type {
+    easy,
+    medium,
+    hard,
+};
+
 struct Table {
     Table(const int x, const int y, const int mine_count)
         : size_x(x), size_y(y), real_index_x(x / 2), real_index_y(y), top_x(0),
@@ -37,6 +44,9 @@ struct Table {
         }
 
         distribute_mines(mine_count);
+
+        // Reveal a small safe area so the player has somewhere to start
+        clear_starting_area();
     }
 
     virtual ~Table() = default;
@@ -55,6 +65,7 @@ struct Table {
     int remaining_mines{};
 
     // ----------------------------------------------------------------------
+    Type type{};
 
     void print_table();
 
@@ -89,17 +100,20 @@ struct Table {
 // SIZE HAS TO BE DIVISIBLE BY 2
 class EasyGame : public Table {
   public:
-    EasyGame() : Table(46, 18, 100) {}
+    EasyGame() : Table(46, 18, 100) {};
+    Type type{Type::easy};
 };
 
 class MediumGame : public Table {
   public:
-    MediumGame() : Table(56, 26, 200) {}
+    MediumGame() : Table(56, 26, 200) {};
+    Type type{Type::medium};
 };
 
 class HardGame : public Table {
   public:
-    HardGame() : Table(86, 32, 300) {}
+    HardGame() : Table(86, 32, 300) {};
+    Type type{Type::hard};
 };
 
 // ---

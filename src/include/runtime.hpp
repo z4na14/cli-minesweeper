@@ -14,11 +14,12 @@ struct Params {
 extern std::mutex MUTEX;
 extern std::atomic<bool> UPDATE_INPUT;
 extern std::atomic<bool> TERMINATE;
+extern std::atomic<bool> RESTART;
 extern std::atomic<bool> DEAD;
 
 // ----------------------------------------------------------------------
 
-void init_bootstrap(game::Table *table);
+void init_bootstrap();
 
 void loop_runtime(game::Table *table);
 
